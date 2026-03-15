@@ -3,6 +3,8 @@
 import { FormEvent, startTransition, useState } from "react";
 import { motion } from "framer-motion";
 
+const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
+
 export const CTA = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -15,6 +17,28 @@ export const CTA = () => {
     const name = String(formData.get("name") ?? "").trim();
     const email = String(formData.get("email") ?? "").trim();
     const message = String(formData.get("message") ?? "").trim();
+    const attachment = formData.get("attachment");
+
+    if (!name || !email || !message) {
+      setStatusType("error");
+      setStatusMessage("Please complete all required fields.");
+      return;
+    }
+
+    if (attachment instanceof File && attachment.size > 0) {
+      const isAllowedByMime = attachment.type === "application/pdf" || attachment.type.startsWith("image/");
+      const isAllowedByExt = /\.(pdf|png|jpe?g|webp|gif|bmp|svg)$/i.test(attachment.name);
+      if (!isAllowedByMime && !isAllowedByExt) {
+        setStatusType("error");
+        setStatusMessage("Only PDF and image files are allowed.");
+        return;
+      }
+      if (attachment.size > MAX_ATTACHMENT_BYTES) {
+        setStatusType("error");
+        setStatusMessage("Attachment is too large. Max size is 10MB.");
+        return;
+      }
+    }
 
     setStatusMessage(null);
     setStatusType(null);
@@ -24,10 +48,7 @@ export const CTA = () => {
       try {
         const response = await fetch("/api/contact", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ name, email, message }),
+          body: formData,
         });
 
         const result = (await response.json()) as { error?: string };
@@ -96,6 +117,18 @@ export const CTA = () => {
               placeholder="Tell us what you need."
               className="rounded-2xl border border-white/25 bg-white/10 px-4 py-3 text-sm font-semibold text-white placeholder:text-white/65 outline-none ring-offset-0 focus:border-white/40 focus:ring-2 focus:ring-white/30"
             />
+          </label>
+          <label className="flex flex-col gap-2 text-left md:col-span-2">
+            <span className="text-xs font-bold uppercase tracking-[0.16em] text-accent-foreground/80">
+              Attachment (Optional)
+            </span>
+            <input
+              type="file"
+              name="attachment"
+              accept=".pdf,image/*"
+              className="rounded-2xl border border-white/25 bg-white/10 px-4 py-3 text-sm font-semibold text-white file:mr-3 file:rounded-full file:border-0 file:bg-white/90 file:px-4 file:py-1.5 file:text-xs file:font-black file:text-foreground hover:file:bg-white"
+            />
+            <span className="text-xs font-semibold text-accent-foreground/80">PDF or image files, max 10MB.</span>
           </label>
 
           <button
