@@ -70,7 +70,7 @@ export const Navbar = () => {
             Contact Us
           </a>
           <a
-            href="#contact"
+            href="/book-call"
             className="rounded-full bg-accent px-6 py-2.5 text-sm font-black text-accent-foreground transition-all hover:scale-105 hover:bg-white hover:shadow-xl hover:shadow-accent/20 active:scale-95"
           >
             Book a Call

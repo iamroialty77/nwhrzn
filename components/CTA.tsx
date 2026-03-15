@@ -64,10 +64,6 @@ export const CTA = () => {
         <h2 className="relative text-center text-4xl font-black leading-[0.95] tracking-tighter md:text-7xl">
           Ready to take your brand to <span className="opacity-60">NWHRZN</span>?
         </h2>
-        <p className="relative mx-auto mt-6 max-w-2xl text-center text-lg font-bold opacity-90 md:text-2xl">
-          Send us a message and it goes straight to <span className="font-black">roi@nwhrzn.digital</span>.
-        </p>
-
         <form
           onSubmit={handleSubmit}
           className="relative mx-auto mt-12 grid w-full max-w-3xl grid-cols-1 gap-4 rounded-3xl bg-background/15 p-5 backdrop-blur-sm md:grid-cols-2 md:p-6"

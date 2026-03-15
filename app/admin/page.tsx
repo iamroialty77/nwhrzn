@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { BarChart3, Layers3, ListChecks, PlusCircle, ShieldCheck, Trash2 } from "lucide-react";
+import { BarChart3, Layers3, ListChecks, PlusCircle, Save, ShieldCheck, Trash2 } from "lucide-react";
 import { metrics, processSteps, testimonials, faqs, caseStudies } from "@/constants";
 import { getAdminServices, LANDING_SERVICE_MARKER } from "@/lib/site-services";
 
@@ -143,6 +143,49 @@ async function deleteService(formData: FormData) {
   revalidatePath("/");
   revalidatePath("/admin");
   redirect("/admin?service=deleted");
+}
+
+async function updateService(formData: FormData) {
+  "use server";
+
+  const id = String(formData.get("id") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const imageUrl = String(formData.get("image_url") ?? "").trim();
+  const sortOrderRaw = String(formData.get("sort_order") ?? "").trim();
+  const sortOrder = Number.parseInt(sortOrderRaw, 10);
+
+  if (!id) {
+    redirect("/admin?service=missing-id");
+  }
+
+  if (!title) {
+    redirect("/admin?service=missing-title");
+  }
+
+  const supabaseModule = await import("@/lib/supabase/server").catch(() => null);
+  if (!supabaseModule?.supabaseAdmin) {
+    redirect("/admin?service=supabase-missing");
+  }
+
+  const { error } = await supabaseModule.supabaseAdmin
+    .from("portfolio_projects")
+    .update({
+      title,
+      description: description || null,
+      image_url: imageUrl || null,
+      sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
+    })
+    .eq("id", id)
+    .eq("github_url", LANDING_SERVICE_MARKER);
+
+  if (error) {
+    redirect(`/admin?service=error&message=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  redirect("/admin?service=updated");
 }
 
 export const metadata: Metadata = {
@@ -307,6 +350,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                   <tr className="border-b border-border text-left text-muted-foreground">
                     <th className="whitespace-nowrap px-3 py-2 font-semibold uppercase">Title</th>
                     <th className="whitespace-nowrap px-3 py-2 font-semibold uppercase">Description</th>
+                    <th className="whitespace-nowrap px-3 py-2 font-semibold uppercase">Image URL</th>
                     <th className="whitespace-nowrap px-3 py-2 font-semibold uppercase">Sort</th>
                     <th className="whitespace-nowrap px-3 py-2 font-semibold uppercase">Actions</th>
                   </tr>
@@ -314,20 +358,67 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
                 <tbody>
                   {managedServices.map((service) => (
                     <tr key={service.id} className="border-b border-border/70 align-top">
-                      <td className="px-3 py-3 font-semibold">{service.title}</td>
-                      <td className="max-w-xl px-3 py-3 text-muted-foreground">{truncate(service.description)}</td>
-                      <td className="px-3 py-3">{service.sortOrder}</td>
                       <td className="px-3 py-3">
-                        <form action={deleteService}>
-                          <input type="hidden" name="id" value={service.id} />
-                          <button
-                            type="submit"
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/50 px-3 py-1.5 font-semibold text-rose-300 transition-colors hover:bg-rose-500/20"
-                          >
-                            <Trash2 size={14} />
-                            Delete
-                          </button>
-                        </form>
+                        <input
+                          form={`update-service-${service.id}`}
+                          type="text"
+                          name="title"
+                          required
+                          defaultValue={service.title}
+                          className="w-full min-w-[180px] rounded-lg border border-border bg-background px-3 py-2 font-semibold outline-none ring-accent focus:ring-2"
+                        />
+                      </td>
+                      <td className="px-3 py-3">
+                        <textarea
+                          form={`update-service-${service.id}`}
+                          name="description"
+                          defaultValue={service.description}
+                          rows={3}
+                          className="w-full min-w-[260px] rounded-lg border border-border bg-background px-3 py-2 text-muted-foreground outline-none ring-accent focus:ring-2"
+                        />
+                      </td>
+                      <td className="px-3 py-3">
+                        <input
+                          form={`update-service-${service.id}`}
+                          type="url"
+                          name="image_url"
+                          defaultValue={service.image}
+                          className="w-full min-w-[220px] rounded-lg border border-border bg-background px-3 py-2 outline-none ring-accent focus:ring-2"
+                        />
+                      </td>
+                      <td className="px-3 py-3">
+                        <input
+                          form={`update-service-${service.id}`}
+                          type="number"
+                          name="sort_order"
+                          min={0}
+                          defaultValue={service.sortOrder}
+                          className="w-24 rounded-lg border border-border bg-background px-3 py-2 outline-none ring-accent focus:ring-2"
+                        />
+                      </td>
+                      <td className="px-3 py-3">
+                        <div className="flex flex-wrap gap-2">
+                          <form id={`update-service-${service.id}`} action={updateService}>
+                            <input type="hidden" name="id" value={service.id} />
+                            <button
+                              type="submit"
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-accent/60 px-3 py-1.5 font-semibold text-accent transition-colors hover:bg-accent/10"
+                            >
+                              <Save size={14} />
+                              Save
+                            </button>
+                          </form>
+                          <form action={deleteService}>
+                            <input type="hidden" name="id" value={service.id} />
+                            <button
+                              type="submit"
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/50 px-3 py-1.5 font-semibold text-rose-300 transition-colors hover:bg-rose-500/20"
+                            >
+                              <Trash2 size={14} />
+                              Delete
+                            </button>
+                          </form>
+                        </div>
                       </td>
                     </tr>
                   ))}
