@@ -11,6 +11,7 @@ type ContactPayload = {
 };
 
 const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+const hasEmailLikeValue = (value: string) => /[^\s@]+@[^\s@]+\.[^\s@]+/.test(value);
 
 const toSafeText = (value: unknown) =>
   String(value ?? "")
@@ -52,6 +53,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "SMTP_PORT must be a number." }, { status: 500 });
   }
 
+  if (!hasEmailLikeValue(smtpFrom)) {
+    return NextResponse.json(
+      { error: "SMTP_FROM must include a valid sender email, e.g. NWHRZN Website <roi@nwhrzn.digital>." },
+      { status: 500 }
+    );
+  }
+
   try {
     const transporter = nodemailer.createTransport({
       host: smtpHost,
@@ -76,7 +84,8 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ ok: true });
-  } catch {
+  } catch (error) {
+    console.error("Contact email send failed:", error);
     return NextResponse.json({ error: "Failed to send message. Please try again." }, { status: 500 });
   }
 }
