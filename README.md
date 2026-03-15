@@ -20,6 +20,38 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Contact Email Setup
+
+The homepage contact form sends inquiries to `roi@nwhrzn.digital` via `POST /api/contact`.
+
+Add these environment variables to `.env.local` and your deployment environment:
+
+```bash
+SMTP_HOST=smtp.your-provider.com
+SMTP_PORT=587
+SMTP_USER=your-smtp-user
+SMTP_PASS=your-smtp-password
+SMTP_FROM="NWHRZN Website <no-reply@nwhrzn.digital>"
+```
+
+After setting env vars, restart the dev server.
+
+## Contact Email Setup
+
+The homepage contact form sends inquiries to `roi@nwhrzn.digital` via `POST /api/contact`.
+
+Add these environment variables to `.env.local` and your deployment environment:
+
+```bash
+SMTP_HOST=smtp.your-provider.com
+SMTP_PORT=587
+SMTP_USER=your-smtp-user
+SMTP_PASS=your-smtp-password
+SMTP_FROM="NWHRZN Website <no-reply@nwhrzn.digital>"
+```
+
+Restart the dev server after updating env vars.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

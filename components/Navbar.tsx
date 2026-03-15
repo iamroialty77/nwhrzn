@@ -58,7 +58,13 @@ export const Navbar = () => {
 
         <div className="flex items-center gap-4">
           <a
-            href="mailto:hello@nwhrzn.com"
+            href="/admin"
+            className="hidden rounded-full border border-border px-4 py-2 text-sm font-bold text-muted-foreground transition-colors hover:border-accent hover:text-accent sm:block"
+          >
+            Admin
+          </a>
+          <a
+            href="mailto:roi@nwhrzn.digital"
             className="hidden rounded-full px-5 py-2 text-sm font-bold transition-colors hover:text-accent sm:block"
           >
             Contact Us
@@ -102,7 +108,14 @@ export const Navbar = () => {
               ))}
               <hr className="border-border" />
               <a
-                href="mailto:hello@nwhrzn.com"
+                href="/admin"
+                className="text-lg font-bold text-muted-foreground"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Admin
+              </a>
+              <a
+                href="mailto:roi@nwhrzn.digital"
                 className="text-lg font-bold text-accent"
                 onClick={() => setIsMobileMenuOpen(false)}
               >

@@ -1,77 +1,58 @@
-"use client";
+import { getLandingServices } from "@/lib/site-services";
 
-import { motion } from "framer-motion";
-import Image from "next/image";
-import { services } from "@/constants";
+export async function Services() {
+  const services = await getLandingServices();
 
-export const Services = () => {
   return (
-    <section id="services" className="mx-auto max-w-7xl px-6 py-24 md:py-32 lg:px-8">
-      <div className="text-center">
-        <motion.span 
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-sm font-black tracking-[0.3em] text-accent uppercase"
-        >
-          What We Do
-        </motion.span>
-        <motion.h2 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
-          className="mt-6 text-4xl font-black tracking-tighter md:text-6xl"
-        >
-          Services built for <span className="text-gradient">digital growth</span>
-        </motion.h2>
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-          className="mx-auto mt-8 max-w-2xl text-xl font-medium text-muted-foreground"
-        >
-          Comprehensive digital marketing solutions tailored to your business needs.
-        </motion.p>
+    <section id="services" className="relative overflow-hidden py-28">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/2 top-0 h-72 w-[42rem] -translate-x-1/2 rounded-full bg-accent/10 blur-3xl" />
+        <div className="absolute -bottom-32 -left-16 h-72 w-72 rounded-full bg-sky-500/10 blur-3xl" />
       </div>
 
-      <div className="mt-24 grid gap-10 md:grid-cols-2 lg:grid-cols-3">
-        {services.map((service, idx) => (
-          <motion.article
-            key={service.title}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: idx * 0.1 }}
-            className="group relative flex flex-col overflow-hidden rounded-[32px] border border-border bg-muted/20 transition-all hover:-translate-y-2 hover:bg-muted/40 hover:shadow-2xl hover:shadow-accent/5"
-          >
-            <div className="relative h-56 w-full overflow-hidden">
-              <Image
+      <div className="relative mx-auto w-full max-w-7xl px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="inline-flex items-center rounded-full border border-accent/40 bg-accent/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-accent">
+            Core Services
+          </p>
+          <h2 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
+            Premium Digital Services That Convert
+          </h2>
+          <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+            Structured offers built for measurable growth. Every card here is managed from your admin panel and
+            published live.
+          </p>
+        </div>
+
+        <div className="mt-14 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {services.map((service, index) => (
+            <article
+              key={service.id}
+              className="group relative overflow-hidden rounded-3xl border border-border bg-gradient-to-b from-muted/60 to-background/80 transition-all duration-300 hover:-translate-y-1.5 hover:border-accent/60"
+            >
+              <div className="absolute right-4 top-4 rounded-full border border-border/80 bg-background/80 px-3 py-1 text-xs font-bold text-muted-foreground">
+                {String(index + 1).padStart(2, "0")}
+              </div>
+              <img
                 src={service.image}
                 alt={service.title}
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
+                className="h-44 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-muted/95 to-transparent opacity-60 transition-opacity group-hover:opacity-40" />
-              <div className="absolute bottom-6 left-8 flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/20 text-accent backdrop-blur-md transition-all group-hover:bg-accent group-hover:text-accent-foreground group-hover:scale-110">
-                <span className="text-lg font-black">{idx + 1}</span>
+              <div className="p-6">
+                <h3 className="text-2xl font-black tracking-tight text-foreground">{service.title}</h3>
+                <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-muted-foreground">{service.description}</p>
+                <a
+                  href="#contact"
+                  className="mt-5 inline-flex items-center text-sm font-bold text-accent transition-colors hover:text-white"
+                >
+                  Discuss this service
+                </a>
               </div>
-            </div>
-            <div className="flex flex-col p-10 pt-8">
-              <h3 className="text-2xl font-black tracking-tight group-hover:text-accent transition-colors">
-                {service.title}
-              </h3>
-              <p className="mt-5 flex-grow text-lg font-medium text-muted-foreground leading-relaxed">
-                {service.description}
-              </p>
-              <div className="mt-10 flex items-center gap-3 text-sm font-black text-accent uppercase tracking-widest">
-                Explore service <span className="transition-transform group-hover:translate-x-2">→</span>
-              </div>
-            </div>
-          </motion.article>
-        ))}
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );
-};
+}
