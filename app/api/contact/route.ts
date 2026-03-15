@@ -39,11 +39,11 @@ export async function POST(request: Request) {
   const smtpPortRaw = process.env.SMTP_PORT;
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
-  const smtpFrom = process.env.SMTP_FROM;
+  const smtpFromRaw = process.env.SMTP_FROM;
 
-  if (!smtpHost || !smtpPortRaw || !smtpUser || !smtpPass || !smtpFrom) {
+  if (!smtpHost || !smtpPortRaw || !smtpUser || !smtpPass) {
     return NextResponse.json(
-      { error: "Email service is not configured yet. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, and SMTP_FROM." },
+      { error: "Email service is not configured yet. Set SMTP_HOST, SMTP_PORT, SMTP_USER, and SMTP_PASS." },
       { status: 500 }
     );
   }
@@ -53,12 +53,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "SMTP_PORT must be a number." }, { status: 500 });
   }
 
-  if (!hasEmailLikeValue(smtpFrom)) {
-    return NextResponse.json(
-      { error: "SMTP_FROM must include a valid sender email, e.g. NWHRZN Website <roi@nwhrzn.digital>." },
-      { status: 500 }
-    );
-  }
+  const smtpFrom = (smtpFromRaw && hasEmailLikeValue(smtpFromRaw) ? smtpFromRaw : smtpUser).trim();
 
   try {
     const transporter = nodemailer.createTransport({
@@ -70,6 +65,8 @@ export async function POST(request: Request) {
         pass: smtpPass,
       },
     });
+
+    await transporter.verify();
 
     await transporter.sendMail({
       from: smtpFrom,
@@ -84,8 +81,13 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ ok: true });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Contact email send failed:", error);
-    return NextResponse.json({ error: "Failed to send message. Please try again." }, { status: 500 });
+    const maybeError = error as { code?: string; message?: string };
+    const errorCode = maybeError?.code ? String(maybeError.code) : "UNKNOWN";
+    return NextResponse.json(
+      { error: `Failed to send message. SMTP error: ${errorCode}.` },
+      { status: 500 }
+    );
   }
 }
