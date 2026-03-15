@@ -4,8 +4,36 @@ import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 import { pageGroups } from "@/constants";
 
 export const Footer = () => {
+  const socialLinks = [
+    { Icon: Facebook, href: "#", label: "Facebook", className: "bg-[#1877F2] hover:bg-[#1668d8]" },
+    {
+      Icon: Instagram,
+      href: "#",
+      label: "Instagram",
+      className:
+        "bg-gradient-to-br from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] hover:brightness-110",
+    },
+    { Icon: Twitter, href: "#", label: "Twitter", className: "bg-[#1DA1F2] hover:bg-[#0d8dd8]" },
+    { Icon: Linkedin, href: "#", label: "LinkedIn", className: "bg-[#0A66C2] hover:bg-[#08539d]" },
+  ];
+
   return (
     <footer className="border-t border-border bg-background pt-24 pb-12">
+      <aside className="pointer-events-none fixed right-5 top-1/2 z-40 hidden -translate-y-1/2 lg:block">
+        <div className="pointer-events-auto flex flex-col gap-3 rounded-2xl border border-border/70 bg-background/75 p-3 shadow-xl backdrop-blur-md">
+          {socialLinks.map(({ Icon, href, label, className }) => (
+            <a
+              key={label}
+              href={href}
+              className={`flex h-11 w-11 items-center justify-center rounded-full text-white transition-all hover:-translate-y-0.5 ${className}`}
+              aria-label={label}
+            >
+              <Icon size={20} />
+            </a>
+          ))}
+        </div>
+      </aside>
+
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="flex flex-col gap-20 lg:flex-row lg:justify-between">
           <div className="max-w-sm">
@@ -17,18 +45,13 @@ export const Footer = () => {
               Philippines-based digital marketing agency delivering strategic,
               creative, and measurable growth campaigns.
             </p>
-            <div className="mt-8 flex gap-5">
-              {[
-                { Icon: Facebook, href: "#" },
-                { Icon: Instagram, href: "#" },
-                { Icon: Twitter, href: "#" },
-                { Icon: Linkedin, href: "#" },
-              ].map(({ Icon, href }, i) => (
+            <div className="mt-8 flex gap-5 lg:hidden">
+              {socialLinks.map(({ Icon, href, label, className }) => (
                 <a
-                  key={i}
+                  key={label}
                   href={href}
-                  className="flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground transition-all hover:scale-110 hover:bg-accent hover:text-accent-foreground"
-                  aria-label={`Social Media ${i + 1}`}
+                  className={`flex h-11 w-11 items-center justify-center rounded-full text-white transition-all hover:scale-110 ${className}`}
+                  aria-label={label}
                 >
                   <Icon size={22} />
                 </a>

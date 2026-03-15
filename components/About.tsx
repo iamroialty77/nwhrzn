@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
 
 export const About = () => {
   return (
@@ -48,14 +47,14 @@ export const About = () => {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            <div className="relative aspect-square overflow-hidden rounded-[40px] border border-border bg-muted group">
-              <Image
+            <div className="overflow-hidden rounded-[40px] border border-border bg-muted group">
+              <img
                 src="/Owner.png"
                 alt="Owner of NWHRZN"
-                fill
-                className="object-cover grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
+                width={1080}
+                height={1920}
+                className="block h-auto w-full object-cover object-top grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
             </div>
             
             <motion.div 

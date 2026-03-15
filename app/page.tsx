@@ -1,4 +1,3 @@
-﻿import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { About } from "@/components/About";
 import { Services } from "@/components/Services";
@@ -9,12 +8,13 @@ import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
+import { getLandingTestimonials } from "@/lib/site-testimonials";
 
-export default function Home() {
+export default async function Home() {
+  const testimonials = await getLandingTestimonials();
+
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-accent selection:text-accent-foreground font-sans overflow-x-hidden">
-      <Navbar />
-      
       <main>
         <Hero />
         <About />
@@ -22,7 +22,7 @@ export default function Home() {
         <WhyUs />
         <Process />
         <CaseStudies />
-        <Testimonials />
+        <Testimonials testimonials={testimonials} />
         <FAQ />
         <CTA />
       </main>

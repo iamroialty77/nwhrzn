@@ -1,9 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { testimonials } from "@/constants";
 
-export const Testimonials = () => {
+type TestimonialItem = {
+  id: string;
+  quote: string;
+  name: string;
+};
+
+type TestimonialsProps = {
+  testimonials: TestimonialItem[];
+};
+
+export const Testimonials = ({ testimonials }: TestimonialsProps) => {
   return (
     <section className="mx-auto max-w-7xl px-6 py-24 md:py-32 lg:px-8">
       <div className="text-center">
@@ -29,7 +38,7 @@ export const Testimonials = () => {
       <div className="mt-20 grid gap-10 md:grid-cols-2 lg:grid-cols-3">
         {testimonials.map((item, idx) => (
           <motion.article
-            key={item.name}
+            key={item.id}
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}

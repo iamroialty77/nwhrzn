@@ -5,38 +5,31 @@ import { metrics } from "@/constants";
 
 export const Hero = () => {
   return (
-    <section className="relative mx-auto flex max-w-7xl flex-col items-center px-6 pt-36 pb-24 text-center md:pt-48 md:pb-32 lg:px-8">
+    <section className="relative mx-auto flex max-w-7xl flex-col items-center px-6 pt-20 pb-24 text-center md:pt-24 md:pb-32 lg:px-8">
       {/* Background Gradients */}
       <div className="absolute top-0 -left-[10%] -z-10 h-[500px] w-[500px] rounded-full bg-accent/10 blur-[120px]" />
       <div className="absolute top-[20%] -right-[10%] -z-10 h-[600px] w-[600px] rounded-full bg-blue-500/10 blur-[120px]" />
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/5 px-4 py-2 text-xs font-black tracking-widest text-accent uppercase"
-      >
-        <span className="relative flex h-2.5 w-2.5">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75"></span>
-          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-accent"></span>
-        </span>
-        Philippines-Based Digital Marketing Agency
-      </motion.div>
-
-      <motion.h1
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1 }}
-        className="mt-10 max-w-5xl text-5xl font-black tracking-tighter md:text-7xl lg:text-9xl leading-[0.9]"
+        className="w-full max-w-3xl md:max-w-4xl"
       >
-        Taking your brand to <span className="text-gradient">NWHRZN</span>
-      </motion.h1>
+        <img
+          src="/Company_Logo.png"
+          alt="NWHRZN"
+          width={677}
+          height={369}
+          className="mx-auto w-full h-auto max-w-[560px] object-contain"
+        />
+      </motion.div>
 
       <motion.p
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="mt-10 max-w-3xl text-xl font-medium leading-relaxed text-muted-foreground md:text-2xl"
+        className="mt-4 max-w-3xl text-xl font-medium leading-relaxed text-muted-foreground md:text-2xl"
       >
         Strategic marketing solutions designed to increase brand awareness,
         engage audiences, and drive real business growth — data-driven
@@ -47,7 +40,7 @@ export const Hero = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.3 }}
-        className="mt-14 flex flex-col items-center gap-5 sm:flex-row"
+        className="mt-8 flex flex-col items-center gap-4 sm:flex-row"
       >
         <a
           href="#contact"
