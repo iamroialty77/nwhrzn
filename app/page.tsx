@@ -8,10 +8,14 @@ import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
 import { CTA } from "@/components/CTA";
 import { Footer } from "@/components/Footer";
+import { getLandingWhyUsContent } from "@/lib/site-differentiators";
 import { getLandingTestimonials } from "@/lib/site-testimonials";
 
 export default async function Home() {
-  const testimonials = await getLandingTestimonials();
+  const [testimonials, whyUsContent] = await Promise.all([
+    getLandingTestimonials(),
+    getLandingWhyUsContent(),
+  ]);
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-accent selection:text-accent-foreground font-sans overflow-x-hidden">
@@ -19,7 +23,7 @@ export default async function Home() {
         <Hero />
         <About />
         <Services />
-        <WhyUs />
+        <WhyUs content={whyUsContent} />
         <Process />
         <CaseStudies />
         <Testimonials testimonials={testimonials} />

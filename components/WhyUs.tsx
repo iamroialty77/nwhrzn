@@ -1,9 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { differentiators } from "@/constants";
+import type { WhyUsContent } from "@/lib/site-differentiators";
 
-export const WhyUs = () => {
+type WhyUsProps = {
+  content: WhyUsContent;
+};
+
+export const WhyUs = ({ content }: WhyUsProps) => {
   return (
     <section className="bg-muted py-24 md:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
@@ -14,18 +18,18 @@ export const WhyUs = () => {
             viewport={{ once: true }}
             className="lg:w-1/3"
           >
-            <span className="text-sm font-black tracking-[0.3em] text-accent uppercase">Why NWHRZN</span>
+            <span className="text-sm font-black tracking-[0.3em] text-accent uppercase">{content.eyebrow}</span>
             <h2 className="mt-6 text-4xl font-black tracking-tighter md:text-6xl leading-tight">
-              What makes us <span className="text-gradient">different</span>
+              {content.heading}
             </h2>
             <p className="mt-8 text-xl font-medium text-muted-foreground leading-relaxed">
-              We don&apos;t just post content — we build strategies that move the needle for your brand.
+              {content.lead}
             </p>
           </motion.div>
           <div className="grid gap-8 sm:grid-cols-2 lg:w-2/3">
-            {differentiators.map((item, idx) => (
+            {content.items.map((item, idx) => (
               <motion.article
-                key={item.title}
+                key={item.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}

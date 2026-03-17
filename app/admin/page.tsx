@@ -4,6 +4,12 @@ import { redirect } from "next/navigation";
 import { BarChart3, Layers3, ListChecks, PlusCircle, Save, ShieldCheck, Trash2 } from "lucide-react";
 import { metrics, processSteps, faqs, caseStudies } from "@/constants";
 import { getAdminServices, LANDING_SERVICE_MARKER } from "@/lib/site-services";
+import {
+  getAdminWhyUsContent,
+  getAdminWhyUsItems,
+  WHY_US_CONTENT_MARKER,
+  WHY_US_ITEM_MARKER,
+} from "@/lib/site-differentiators";
 import { getAdminTestimonials, LANDING_TESTIMONIAL_MARKER } from "@/lib/site-testimonials";
 
 type InquiryOverview = {
@@ -227,6 +233,173 @@ async function createTestimonial(formData: FormData) {
   redirect("/admin?testimonial=added");
 }
 
+async function updateWhyUsContent(formData: FormData) {
+  "use server";
+
+  const eyebrow = String(formData.get("eyebrow") ?? "").trim();
+  const heading = String(formData.get("heading") ?? "").trim();
+  const lead = String(formData.get("lead") ?? "").trim();
+
+  if (!eyebrow) {
+    redirect("/admin?whyus=missing-eyebrow");
+  }
+
+  if (!heading) {
+    redirect("/admin?whyus=missing-heading");
+  }
+
+  if (!lead) {
+    redirect("/admin?whyus=missing-lead");
+  }
+
+  const supabaseModule = await import("@/lib/supabase/server").catch(() => null);
+  if (!supabaseModule?.supabaseAdmin) {
+    redirect("/admin?whyus=supabase-missing");
+  }
+
+  const { data: existing, error: fetchError } = await supabaseModule.supabaseAdmin
+    .from("portfolio_projects")
+    .select("id")
+    .eq("github_url", WHY_US_CONTENT_MARKER)
+    .limit(1)
+    .maybeSingle();
+
+  if (fetchError) {
+    redirect(`/admin?whyus=error&message=${encodeURIComponent(fetchError.message)}`);
+  }
+
+  const payload = {
+    title: eyebrow,
+    image_url: heading,
+    description: lead,
+    sort_order: 0,
+    github_url: WHY_US_CONTENT_MARKER,
+  };
+
+  const result = existing?.id
+    ? await supabaseModule.supabaseAdmin.from("portfolio_projects").update(payload).eq("id", existing.id)
+    : await supabaseModule.supabaseAdmin.from("portfolio_projects").insert(payload);
+
+  if (result.error) {
+    redirect(`/admin?whyus=error&message=${encodeURIComponent(result.error.message)}`);
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  redirect("/admin?whyus=updated");
+}
+
+async function createWhyUsItem(formData: FormData) {
+  "use server";
+
+  const title = String(formData.get("title") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const sortOrderRaw = String(formData.get("sort_order") ?? "").trim();
+  const sortOrder = Number.parseInt(sortOrderRaw, 10);
+
+  if (!title) {
+    redirect("/admin?whyusitem=missing-title");
+  }
+
+  if (!description) {
+    redirect("/admin?whyusitem=missing-description");
+  }
+
+  const supabaseModule = await import("@/lib/supabase/server").catch(() => null);
+  if (!supabaseModule?.supabaseAdmin) {
+    redirect("/admin?whyusitem=supabase-missing");
+  }
+
+  const { error } = await supabaseModule.supabaseAdmin.from("portfolio_projects").insert({
+    title,
+    description,
+    image_url: null,
+    sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
+    github_url: WHY_US_ITEM_MARKER,
+  });
+
+  if (error) {
+    redirect(`/admin?whyusitem=error&message=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  redirect("/admin?whyusitem=added");
+}
+
+async function updateWhyUsItem(formData: FormData) {
+  "use server";
+
+  const id = String(formData.get("id") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const sortOrderRaw = String(formData.get("sort_order") ?? "").trim();
+  const sortOrder = Number.parseInt(sortOrderRaw, 10);
+
+  if (!id) {
+    redirect("/admin?whyusitem=missing-id");
+  }
+
+  if (!title) {
+    redirect("/admin?whyusitem=missing-title");
+  }
+
+  if (!description) {
+    redirect("/admin?whyusitem=missing-description");
+  }
+
+  const supabaseModule = await import("@/lib/supabase/server").catch(() => null);
+  if (!supabaseModule?.supabaseAdmin) {
+    redirect("/admin?whyusitem=supabase-missing");
+  }
+
+  const { error } = await supabaseModule.supabaseAdmin
+    .from("portfolio_projects")
+    .update({
+      title,
+      description,
+      sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
+    })
+    .eq("id", id)
+    .eq("github_url", WHY_US_ITEM_MARKER);
+
+  if (error) {
+    redirect(`/admin?whyusitem=error&message=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  redirect("/admin?whyusitem=updated");
+}
+
+async function deleteWhyUsItem(formData: FormData) {
+  "use server";
+
+  const id = String(formData.get("id") ?? "").trim();
+  if (!id) {
+    redirect("/admin?whyusitem=missing-id");
+  }
+
+  const supabaseModule = await import("@/lib/supabase/server").catch(() => null);
+  if (!supabaseModule?.supabaseAdmin) {
+    redirect("/admin?whyusitem=supabase-missing");
+  }
+
+  const { error } = await supabaseModule.supabaseAdmin
+    .from("portfolio_projects")
+    .delete()
+    .eq("id", id)
+    .eq("github_url", WHY_US_ITEM_MARKER);
+
+  if (error) {
+    redirect(`/admin?whyusitem=error&message=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePath("/");
+  revalidatePath("/admin");
+  redirect("/admin?whyusitem=deleted");
+}
+
 async function updateTestimonial(formData: FormData) {
   "use server";
 
@@ -314,13 +487,20 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   const inquiries = await getInquiryOverview();
   const managedServices = await getAdminServices();
   const managedTestimonials = await getAdminTestimonials();
+  const whyUsContent = await getAdminWhyUsContent();
+  const whyUsItems = await getAdminWhyUsItems();
   const serviceStatus = typeof params.service === "string" ? params.service : null;
   const testimonialStatus = typeof params.testimonial === "string" ? params.testimonial : null;
+  const whyUsStatus = typeof params.whyus === "string" ? params.whyus : null;
+  const whyUsItemStatus = typeof params.whyusitem === "string" ? params.whyusitem : null;
   const serviceErrorMessage = typeof params.message === "string" ? params.message : null;
   const testimonialErrorMessage = typeof params.message === "string" ? params.message : null;
+  const whyUsErrorMessage = typeof params.message === "string" ? params.message : null;
+  const whyUsItemErrorMessage = typeof params.message === "string" ? params.message : null;
 
   const cards = [
     { label: "Services", value: managedServices.length, icon: Layers3 },
+    { label: "Why Us Cards", value: whyUsItems.length, icon: ShieldCheck },
     { label: "Case Studies", value: caseStudies.length, icon: ListChecks },
     { label: "Testimonials", value: managedTestimonials.length, icon: ShieldCheck },
     { label: "FAQ Items", value: faqs.length, icon: BarChart3 },
@@ -380,6 +560,215 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               <p className="mt-1 text-xs text-muted-foreground">Updated from current source data.</p>
             </article>
           ))}
+        </section>
+
+        <section className="rounded-2xl border border-border/80 bg-gradient-to-b from-muted/55 to-background/70 p-6">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <h2 className="text-2xl font-black">Why NWHRZN Manager</h2>
+            <p className="rounded-full border border-border bg-background/70 px-3 py-1.5 text-xs text-muted-foreground">
+              Source: <span className="font-bold text-accent">portfolio_projects ({WHY_US_CONTENT_MARKER} / {WHY_US_ITEM_MARKER})</span>
+            </p>
+          </div>
+
+          {whyUsStatus ? (
+            <p className="mt-4 rounded-xl border border-border bg-background/70 px-4 py-3 text-sm text-muted-foreground">
+              Section Status: <span className="font-bold text-foreground">{whyUsStatus}</span>
+              {whyUsErrorMessage ? ` - ${whyUsErrorMessage}` : ""}
+            </p>
+          ) : null}
+
+          {whyUsItemStatus ? (
+            <p className="mt-4 rounded-xl border border-border bg-background/70 px-4 py-3 text-sm text-muted-foreground">
+              Card Status: <span className="font-bold text-foreground">{whyUsItemStatus}</span>
+              {whyUsItemErrorMessage ? ` - ${whyUsItemErrorMessage}` : ""}
+            </p>
+          ) : null}
+
+          <div className="mt-6 grid grid-cols-1 gap-5 xl:grid-cols-5">
+            <form
+              action={updateWhyUsContent}
+              className="grid grid-cols-1 gap-3 rounded-2xl border border-border/80 bg-background/50 p-4 md:grid-cols-2 xl:col-span-3"
+            >
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Eyebrow</span>
+                <input
+                  name="eyebrow"
+                  defaultValue={whyUsContent.eyebrow}
+                  required
+                  className="rounded-xl border border-border bg-background px-4 py-2.5 outline-none ring-accent focus:ring-2"
+                />
+              </label>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Heading</span>
+                <input
+                  name="heading"
+                  defaultValue={whyUsContent.heading}
+                  required
+                  className="rounded-xl border border-border bg-background px-4 py-2.5 outline-none ring-accent focus:ring-2"
+                />
+              </label>
+              <label className="flex flex-col gap-1.5 md:col-span-2">
+                <span className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Lead Copy</span>
+                <textarea
+                  name="lead"
+                  defaultValue={whyUsContent.lead}
+                  rows={4}
+                  required
+                  className="rounded-xl border border-border bg-background px-4 py-2.5 outline-none ring-accent focus:ring-2"
+                />
+              </label>
+              <button
+                type="submit"
+                className="flex items-center justify-center gap-2 self-end rounded-xl bg-accent px-5 py-2.5 text-sm font-black text-accent-foreground transition-transform hover:scale-[1.02] active:scale-100 md:col-span-2"
+              >
+                <Save size={16} />
+                Save Section Copy
+              </button>
+            </form>
+
+            <aside className="rounded-2xl border border-border/80 bg-background/45 p-4 xl:col-span-2">
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-accent">Editing Guide</p>
+              <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+                <li>Use the eyebrow for the short section label above the headline.</li>
+                <li>Keep the heading concise for stronger visual impact.</li>
+                <li>Lead copy should explain the strategic difference in one paragraph.</li>
+                <li>Cards below can be reordered, updated, added, or removed anytime.</li>
+              </ul>
+            </aside>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 gap-5 xl:grid-cols-5">
+            <form
+              action={createWhyUsItem}
+              className="grid grid-cols-1 gap-3 rounded-2xl border border-border/80 bg-background/50 p-4 md:grid-cols-2 xl:col-span-3"
+            >
+              <label className="flex flex-col gap-1.5 md:col-span-2">
+                <span className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Card Title</span>
+                <input
+                  name="title"
+                  placeholder="Results-driven approach"
+                  required
+                  className="rounded-xl border border-border bg-background px-4 py-2.5 outline-none ring-accent focus:ring-2"
+                />
+              </label>
+              <label className="flex flex-col gap-1.5 md:col-span-2">
+                <span className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Description</span>
+                <textarea
+                  name="description"
+                  placeholder="Explain what makes your agency different."
+                  rows={4}
+                  required
+                  className="rounded-xl border border-border bg-background px-4 py-2.5 outline-none ring-accent focus:ring-2"
+                />
+              </label>
+              <label className="flex flex-col gap-1.5">
+                <span className="text-xs font-semibold uppercase tracking-[0.15em] text-muted-foreground">Sort Order</span>
+                <input
+                  type="number"
+                  name="sort_order"
+                  min={0}
+                  defaultValue={0}
+                  className="rounded-xl border border-border bg-background px-4 py-2.5 outline-none ring-accent focus:ring-2"
+                />
+              </label>
+              <button
+                type="submit"
+                className="flex items-center justify-center gap-2 self-end rounded-xl bg-accent px-5 py-2.5 text-sm font-black text-accent-foreground transition-transform hover:scale-[1.02] active:scale-100"
+              >
+                <PlusCircle size={16} />
+                Add Card
+              </button>
+            </form>
+
+            <aside className="rounded-2xl border border-border/80 bg-background/45 p-4 xl:col-span-2">
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-accent">Card Strategy</p>
+              <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
+                <li>Each card should communicate one real differentiator only.</li>
+                <li>Use sort order to control the homepage sequence.</li>
+                <li>Keep titles punchy and descriptions proof-oriented.</li>
+                <li>Delete removes the card from the landing page immediately after publish.</li>
+              </ul>
+            </aside>
+          </div>
+
+          {whyUsItems.length > 0 ? (
+            <div className="mt-6 overflow-x-auto rounded-2xl border border-border/80">
+              <table className="min-w-full border-collapse text-sm">
+                <thead className="bg-background/85">
+                  <tr className="border-b border-border text-left text-muted-foreground">
+                    <th className="whitespace-nowrap px-3 py-2 font-semibold uppercase">Card Title</th>
+                    <th className="whitespace-nowrap px-3 py-2 font-semibold uppercase">Description</th>
+                    <th className="whitespace-nowrap px-3 py-2 font-semibold uppercase">Sort</th>
+                    <th className="whitespace-nowrap px-3 py-2 font-semibold uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {whyUsItems.map((item) => (
+                    <tr key={item.id} className="border-b border-border/70 align-top">
+                      <td className="px-3 py-3">
+                        <input
+                          form={`update-whyus-item-${item.id}`}
+                          type="text"
+                          name="title"
+                          required
+                          defaultValue={item.title}
+                          className="w-full min-w-[220px] rounded-lg border border-border bg-background px-3 py-2 font-semibold outline-none ring-accent focus:ring-2"
+                        />
+                      </td>
+                      <td className="px-3 py-3">
+                        <textarea
+                          form={`update-whyus-item-${item.id}`}
+                          name="description"
+                          defaultValue={item.description}
+                          rows={4}
+                          required
+                          className="w-full min-w-[320px] rounded-lg border border-border bg-background px-3 py-2 text-muted-foreground outline-none ring-accent focus:ring-2"
+                        />
+                      </td>
+                      <td className="px-3 py-3">
+                        <input
+                          form={`update-whyus-item-${item.id}`}
+                          type="number"
+                          name="sort_order"
+                          min={0}
+                          defaultValue={item.sortOrder}
+                          className="w-24 rounded-lg border border-border bg-background px-3 py-2 outline-none ring-accent focus:ring-2"
+                        />
+                      </td>
+                      <td className="px-3 py-3">
+                        <div className="flex flex-wrap gap-2">
+                          <form id={`update-whyus-item-${item.id}`} action={updateWhyUsItem}>
+                            <input type="hidden" name="id" value={item.id} />
+                            <button
+                              type="submit"
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-accent/60 px-3 py-1.5 font-semibold text-accent transition-colors hover:bg-accent/10"
+                            >
+                              <Save size={14} />
+                              Save
+                            </button>
+                          </form>
+                          <form action={deleteWhyUsItem}>
+                            <input type="hidden" name="id" value={item.id} />
+                            <button
+                              type="submit"
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-rose-500/50 px-3 py-1.5 font-semibold text-rose-300 transition-colors hover:bg-rose-500/20"
+                            >
+                              <Trash2 size={14} />
+                              Delete
+                            </button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="mt-4 rounded-xl border border-dashed border-border px-4 py-3 text-sm text-muted-foreground">
+              No admin-managed Why NWHRZN cards yet. Add your first differentiator above and it will publish on the homepage.
+            </p>
+          )}
         </section>
 
         <section className="rounded-2xl border border-border/80 bg-gradient-to-b from-muted/55 to-background/70 p-6">
