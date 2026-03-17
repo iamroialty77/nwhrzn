@@ -43,7 +43,7 @@ export async function Services() {
                 <h3 className="text-2xl font-black tracking-tight text-foreground">{service.title}</h3>
                 <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-muted-foreground">{service.description}</p>
                 <a
-                  href="#contact"
+                  href="/contact#contact"
                   className="mt-5 inline-flex items-center text-sm font-bold text-accent transition-colors hover:text-white"
                 >
                   Discuss this service

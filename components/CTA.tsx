@@ -193,7 +193,7 @@ export const CTA = () => {
             Email Directly
           </a>
           <a
-            href="#contact"
+            href="/book-call"
             className="rounded-full border-2 border-accent-foreground/20 px-8 py-3 text-sm font-black transition-all hover:bg-white/10"
           >
             Schedule Demo

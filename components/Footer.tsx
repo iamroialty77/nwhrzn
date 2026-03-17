@@ -1,9 +1,36 @@
 "use client";
 
+import Link from "next/link";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
-import { pageGroups } from "@/constants";
 
 export const Footer = () => {
+  const pageGroups = [
+    {
+      category: "Company",
+      pages: [
+        { label: "Home", href: "/" },
+        { label: "About Us", href: "/about" },
+        { label: "Services", href: "/services" },
+      ],
+    },
+    {
+      category: "Proof",
+      pages: [
+        { label: "Testimonials", href: "/testimonials" },
+        { label: "Book a Call", href: "/book-call" },
+        { label: "Contact", href: "/contact" },
+      ],
+    },
+    {
+      category: "Support",
+      pages: [
+        { label: "Email Us", href: "mailto:roi@nwhrzn.digital" },
+        { label: "Admin", href: "/admin" },
+        { label: "FAQ", href: "/contact#faq" },
+      ],
+    },
+  ];
+
   const socialLinks = [
     { Icon: Facebook, href: "#", label: "Facebook", className: "bg-[#1877F2] hover:bg-[#1668d8]" },
     {
@@ -65,10 +92,16 @@ export const Footer = () => {
                 <p className="text-sm font-black tracking-widest text-foreground uppercase">{group.category}</p>
                 <ul className="mt-6 space-y-4 text-sm font-medium text-muted-foreground">
                   {group.pages.map((page) => (
-                    <li key={page}>
-                      <a href="#" className="transition-colors hover:text-accent">
-                        {page}
-                      </a>
+                    <li key={page.label}>
+                      {page.href.startsWith("mailto:") ? (
+                        <a href={page.href} className="transition-colors hover:text-accent">
+                          {page.label}
+                        </a>
+                      ) : (
+                        <Link href={page.href} className="transition-colors hover:text-accent">
+                          {page.label}
+                        </Link>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -82,9 +115,9 @@ export const Footer = () => {
             © {new Date().getFullYear()} NWHRZN. All rights reserved.
           </p>
           <div className="flex gap-10 text-sm font-bold text-muted-foreground order-1 md:order-2">
-            <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
-            <a href="#" className="hover:text-foreground transition-colors">Terms</a>
-            <a href="#" className="hover:text-foreground transition-colors">Cookies</a>
+            <Link href="/contact" className="hover:text-foreground transition-colors">Privacy</Link>
+            <Link href="/contact" className="hover:text-foreground transition-colors">Terms</Link>
+            <Link href="/contact" className="hover:text-foreground transition-colors">Cookies</Link>
           </div>
         </div>
       </div>

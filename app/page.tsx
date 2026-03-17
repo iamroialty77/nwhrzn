@@ -7,7 +7,7 @@ import { CaseStudies } from "@/components/CaseStudies";
 import { Testimonials } from "@/components/Testimonials";
 import { FAQ } from "@/components/FAQ";
 import { CTA } from "@/components/CTA";
-import { Footer } from "@/components/Footer";
+import { SiteShell } from "@/components/SiteShell";
 import { getLandingWhyUsContent } from "@/lib/site-differentiators";
 import { getLandingTestimonials } from "@/lib/site-testimonials";
 
@@ -18,8 +18,8 @@ export default async function Home() {
   ]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-accent selection:text-accent-foreground font-sans overflow-x-hidden">
-      <main>
+    <SiteShell>
+      <div>
         <Hero />
         <About />
         <Services />
@@ -29,9 +29,7 @@ export default async function Home() {
         <Testimonials testimonials={testimonials} />
         <FAQ />
         <CTA />
-      </main>
-
-      <Footer />
-    </div>
+      </div>
+    </SiteShell>
   );
 }

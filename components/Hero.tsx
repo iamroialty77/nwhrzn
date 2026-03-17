@@ -43,13 +43,13 @@ export const Hero = () => {
         className="mt-8 flex flex-col items-center gap-4 sm:flex-row"
       >
         <a
-          href="#contact"
+          href="/contact#contact"
           className="rounded-full bg-accent px-10 py-5 text-lg font-black text-accent-foreground transition-all hover:scale-105 hover:bg-white hover:shadow-2xl hover:shadow-accent/30 active:scale-95"
         >
           Get a Free Consultation
         </a>
         <a
-          href="#services"
+          href="/services"
           className="rounded-full border-2 border-border bg-white/5 px-10 py-5 text-lg font-bold backdrop-blur-sm transition-all hover:bg-white/10"
         >
           View Our Services

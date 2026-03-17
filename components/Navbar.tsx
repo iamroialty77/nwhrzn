@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,10 +21,11 @@ export const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { name: "Services", href: "#services" },
-    { name: "Process", href: "#process" },
-    { name: "Case Studies", href: "#case-studies" },
-    { name: "FAQ", href: "#faq" },
+    { name: "Home", href: "/" },
+    { name: "About Us", href: "/about" },
+    { name: "Services", href: "/services" },
+    { name: "Testimonials", href: "/testimonials" },
+    { name: "Contact", href: "/contact" },
   ];
 
   return (
@@ -40,49 +44,58 @@ export const Navbar = () => {
         )}
       >
         <div className="flex items-center">
-          <motion.p
+          <Link href="/">
+            <motion.p
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-xl font-black tracking-tight sm:text-2xl"
-          >
-            NWHRZN
-          </motion.p>
+            >
+              NWHRZN
+            </motion.p>
+          </Link>
         </div>
 
-        {/* Desktop Nav */}
         <nav className="hidden items-center gap-9 text-sm font-semibold tracking-wide text-foreground md:flex">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.name}
-              className="transition-colors hover:text-accent"
+              className={cn(
+                "transition-colors hover:text-accent",
+                pathname === link.href ? "text-accent" : "text-foreground"
+              )}
               href={link.href}
             >
               {link.name}
-            </a>
+            </Link>
           ))}
         </nav>
 
         <div className="flex items-center gap-3">
-          <a
+          <Link
             href="/admin"
             className="hidden rounded-full border border-border px-3 py-1.5 text-xs font-bold text-muted-foreground transition-colors hover:border-accent hover:text-accent xl:block"
           >
             Admin
-          </a>
-          <a
-            href="mailto:roi@nwhrzn.digital"
+          </Link>
+          <Link
+            href="/contact"
             className="hidden rounded-full px-4 py-1.5 text-xs font-bold transition-colors hover:text-accent xl:block"
           >
             Contact Us
-          </a>
+          </Link>
           <a
+            href="mailto:roi@nwhrzn.digital"
+            className="hidden rounded-full px-4 py-1.5 text-xs font-bold text-muted-foreground transition-colors hover:text-accent 2xl:block"
+          >
+            Email
+          </a>
+          <Link
             href="/book-call"
             className="rounded-full bg-accent px-5 py-2.5 text-sm font-black text-accent-foreground transition-all hover:scale-105 hover:bg-white hover:shadow-xl hover:shadow-accent/20 active:scale-95"
           >
             Book a Call
-          </a>
-          
-          {/* Mobile Menu Toggle */}
+          </Link>
+
           <button 
             className="block md:hidden text-foreground"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -92,7 +105,6 @@ export const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -103,30 +115,33 @@ export const Navbar = () => {
           >
             <div className="flex flex-col gap-4 p-6">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.name}
                   href={link.href}
-                  className="text-lg font-bold text-foreground"
+                  className={cn(
+                    "text-lg font-bold",
+                    pathname === link.href ? "text-accent" : "text-foreground"
+                  )}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.name}
-                </a>
+                </Link>
               ))}
               <hr className="border-border" />
-              <a
+              <Link
                 href="/admin"
                 className="text-lg font-bold text-muted-foreground"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Admin
-              </a>
-              <a
-                href="mailto:roi@nwhrzn.digital"
+              </Link>
+              <Link
+                href="/book-call"
                 className="text-lg font-bold text-accent"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Contact Us
-              </a>
+                Book a Call
+              </Link>
             </div>
           </motion.div>
         )}

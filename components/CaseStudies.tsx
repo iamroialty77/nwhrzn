@@ -13,7 +13,7 @@ export const CaseStudies = () => {
             <span className="text-sm font-black tracking-[0.3em] text-accent uppercase">Case Studies</span>
             <h2 className="mt-6 text-4xl font-black tracking-tighter md:text-6xl">Selected client outcomes</h2>
           </div>
-          <a href="#contact" className="text-lg font-bold text-accent hover:underline flex items-center gap-2 mb-2 group">
+          <a href="/testimonials" className="text-lg font-bold text-accent hover:underline flex items-center gap-2 mb-2 group">
             View all projects <span className="group-hover:translate-x-1 transition-transform">→</span>
           </a>
         </div>
