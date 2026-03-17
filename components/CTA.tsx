@@ -2,6 +2,7 @@
 
 import { FormEvent, startTransition, useState } from "react";
 import { motion } from "framer-motion";
+import { error as showErrorNotice } from "@pnotify/core";
 
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
@@ -9,6 +10,15 @@ export const CTA = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [statusType, setStatusType] = useState<"success" | "error" | null>(null);
+
+  const notifyOversizedFile = () => {
+    showErrorNotice({
+      title: "File too large",
+      text: "Attachment is too large. Max size is 10MB.",
+      delay: 3000,
+      styling: "brighttheme",
+    });
+  };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -34,6 +44,7 @@ export const CTA = () => {
         return;
       }
       if (attachment.size > MAX_ATTACHMENT_BYTES) {
+        notifyOversizedFile();
         setStatusType("error");
         setStatusMessage("Attachment is too large. Max size is 10MB.");
         return;
@@ -51,10 +62,24 @@ export const CTA = () => {
           body: formData,
         });
 
-        const result = (await response.json()) as { error?: string };
+        const contentType = response.headers.get("content-type") || "";
+        let errorMessage = "Failed to send message.";
+
+        if (contentType.includes("application/json")) {
+          const result = (await response.json()) as { error?: string };
+          errorMessage = result.error ?? errorMessage;
+        } else {
+          const rawText = (await response.text()).trim();
+          if (response.status === 413 || rawText.toLowerCase().startsWith("request entity too large")) {
+            notifyOversizedFile();
+            errorMessage = "Attachment is too large. Max size is 10MB.";
+          } else if (rawText) {
+            errorMessage = rawText;
+          }
+        }
 
         if (!response.ok) {
-          throw new Error(result.error ?? "Failed to send message.");
+          throw new Error(errorMessage);
         }
 
         setStatusType("success");
