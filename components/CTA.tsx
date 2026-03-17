@@ -2,7 +2,6 @@
 
 import { FormEvent, startTransition, useState } from "react";
 import { motion } from "framer-motion";
-import { error as showErrorNotice } from "@pnotify/core";
 
 const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
 
@@ -11,7 +10,12 @@ export const CTA = () => {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [statusType, setStatusType] = useState<"success" | "error" | null>(null);
 
-  const notifyOversizedFile = () => {
+  const notifyOversizedFile = async () => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    const { error: showErrorNotice } = await import("@pnotify/core");
     showErrorNotice({
       title: "File too large",
       text: "Attachment is too large. Max size is 10MB.",
@@ -44,7 +48,7 @@ export const CTA = () => {
         return;
       }
       if (attachment.size > MAX_ATTACHMENT_BYTES) {
-        notifyOversizedFile();
+        void notifyOversizedFile();
         setStatusType("error");
         setStatusMessage("Attachment is too large. Max size is 10MB.");
         return;
@@ -71,7 +75,7 @@ export const CTA = () => {
         } else {
           const rawText = (await response.text()).trim();
           if (response.status === 413 || rawText.toLowerCase().startsWith("request entity too large")) {
-            notifyOversizedFile();
+            void notifyOversizedFile();
             errorMessage = "Attachment is too large. Max size is 10MB.";
           } else if (rawText) {
             errorMessage = rawText;
